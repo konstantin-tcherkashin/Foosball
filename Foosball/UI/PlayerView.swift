@@ -17,16 +17,18 @@ final class PlayerView: UIView {
         avatarView.contentMode = .scaleAspectFill
         avatarView.tintColor = .lightGray
 
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-
-        if let path = viewModel.avatarImagePath,
-           let image = UIImage(
-            contentsOfFile: documentsDirectory.appendingPathComponent(path).path
-           ) {
-            avatarView.image = image
-        } else {
-            avatarView.image = UIImage(systemName: "person.circle")
+        if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            if let path = viewModel.avatarImagePath,
+               let image = UIImage(
+                contentsOfFile: documentsDirectory.appendingPathComponent(path).path
+               ) {
+                avatarView.image = image
+            } else {
+                avatarView.image = UIImage(systemName: "person.circle")
+            }
         }
+
+
         nameLabel.text = viewModel.name
     }
 

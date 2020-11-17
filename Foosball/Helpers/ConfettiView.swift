@@ -10,8 +10,7 @@ import UIKit
 
 final class ConfettiView: UIView {
 
-    private var emitter: CAEmitterLayer!
-    private var colors: [UIColor]!
+    private var colors = [UIColor]()
 
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -34,28 +33,33 @@ final class ConfettiView: UIView {
         isUserInteractionEnabled = false
     }
 
-    func start(duration: Double) {
-        emitter = CAEmitterLayer()
+    private lazy var emitter: CAEmitterLayer = {
+        let instance = CAEmitterLayer()
 
-        emitter.emitterPosition = CGPoint(x: center.x, y: 0)
-        emitter.emitterShape = .line
-        emitter.emitterSize = CGSize(width: frame.size.width, height: 1)
-        emitter.beginTime = CACurrentMediaTime() + 0.3
+        instance.emitterPosition = CGPoint(x: center.x, y: 0)
+        instance.emitterShape = .line
+        instance.emitterSize = CGSize(width: frame.size.width, height: 1)
+        instance.beginTime = CACurrentMediaTime() + 0.3
 
         var cells = [CAEmitterCell]()
         for color in colors {
             cells.append(confettiWithColor(color: color))
         }
 
-        emitter.emitterCells = cells
-        layer.addSublayer(emitter)
+        instance.emitterCells = cells
+        instance.birthRate = 0
+        layer.addSublayer(instance)
+        return instance
+    }()
 
+    func start(duration: Double) {
+        emitter.birthRate = 1
+        emitter.beginTime = CACurrentMediaTime()
         perform(#selector(self.stop), with: nil, afterDelay: duration)
-
     }
 
     @objc private func stop() {
-        emitter?.birthRate = 0
+        emitter.birthRate = 0
     }
 
     private func confettiWithColor(color: UIColor) -> CAEmitterCell {
@@ -72,7 +76,7 @@ final class ConfettiView: UIView {
         confetti.spinRange = CGFloat(4.0 * intensity)
         confetti.scaleRange = CGFloat(intensity/10)
         confetti.scaleSpeed = CGFloat(-0.1 * intensity)
-        confetti.contents = UIImage(named: "triangle")!.cgImage
+        confetti.contents = UIImage(named: "triangle")?.cgImage
         return confetti
     }
 

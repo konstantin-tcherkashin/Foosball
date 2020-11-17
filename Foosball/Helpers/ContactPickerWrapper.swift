@@ -36,14 +36,16 @@ extension ContactPickerWrapper: CNContactPickerDelegate {
         player.name = name
 
         if let data = contact.thumbnailImageData {
-            let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            let fileName = "\(player.identifier).jpg"
-            let path = documentsDirectory.appendingPathComponent(fileName).path
-            if FileManager.default.fileExists(atPath: path) {
-                try? FileManager.default.removeItem(atPath: path)
+            if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+                let fileName = "\(player.identifier).jpg"
+                let path = documentsDirectory.appendingPathComponent(fileName).path
+                if FileManager.default.fileExists(atPath: path) {
+                    try? FileManager.default.removeItem(atPath: path)
+                }
+                FileManager.default.createFile(atPath: path, contents: data, attributes: nil)
+                player.avatarPath = fileName
             }
-            FileManager.default.createFile(atPath: path, contents: data, attributes: nil)
-            player.avatarPath = fileName
+
         }
 
         completion(player)
